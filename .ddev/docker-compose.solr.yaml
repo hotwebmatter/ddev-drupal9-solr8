@@ -30,7 +30,7 @@ services:
     # The solr docker image is at https://hub.docker.com/_/solr/
     # and code at https://github.com/docker-solr/docker-solr
     # README: https://github.com/docker-solr/docker-solr/blob/master/README.md
-    # It's almost impossible to work with it if you don't read the docs there
+    # It's almost impossible to work with it if you don't read the docs there.
     image: solr:8
     restart: "no"
     # Solr is served from this port inside the container.
@@ -56,7 +56,7 @@ services:
       # each time the ddev project is stopped and started.
       - solr:/var/solr
 
-      # This mounts the conf in .ddev/solr into the container where
+      # This mounts the conf in `.ddev/solr` into the container where
       # the solr-precreate command in the entrypoint uses it as a one-time
       # configuration to copy config into the newly-created core. It is not
       # used if the core has previously been created.
@@ -64,12 +64,24 @@ services:
 
       - ".:/mnt/ddev_config"
 
-      # solr-configupdate.sh copies fresh configuration files into the
-      # solr container on each
-      # startup, so if you change the config in .ddev/solr/conf
-      # it will be refreshed on `ddev start`. The file must be
-      # executable (`chmod +x .ddev/solr/solr-init.sh
-      - "./solr/solr-configupdate.sh:/docker-entrypoint-initdb.d/solr-configupdate.sh"
+      # `solr-configupdate.sh` copies fresh configuration files into the
+      # solr container on each startup, so if you change the config in
+      # `.ddev/solr/conf`
+      # it will be refreshed on `ddev start`.
+      # `solr-configupdate.sh` must be located in `docker-entrypoint-initdb.d`
+      # inside the container.
+      #
+      # ```bash
+      # mkdir .ddev/solr/docker-entrypoint-initdb.d
+      # cd .ddev/solr/docker-entrypoint-initdb.d
+      # curl -O https://raw.githubusercontent.com/drud/ddev/master/pkg/servicetest/testdata/TestServices/solr-configupdate.sh
+      # chmod +x solr-configupdate.sh
+      # ```
+      #
+      # (Note that the mount point here is the script's parent directory,
+      # rather than the script itself. This workaround is necessitated by a bug
+      # which only affects DDEV on WSL2.)
+      - "./solr/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
 
     entrypoint: [ "sh", "-c", "docker-entrypoint.sh solr-precreate dev /solr-conf" ]
 
