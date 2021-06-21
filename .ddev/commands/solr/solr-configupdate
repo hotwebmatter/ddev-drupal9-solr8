@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+## #ddev-generated
+## Description: Apache Solr config update script
+## Usage: solr-configupdate
+## Example: ddev solr-configupdate
+
+# This example runs inside the solr container.
+# Note that this requires that /mnt/ddev_config be mounted
+# into the solr container and of course that you have a container
+# named solr.
+
+# Ensure core config is always up to date even after the
+# core has been created. This does not execute the first time,
+# when solr-precreate has not yet run.
+
+# If no argument given, assume default core is 'dev'.
+# Otherwise, set CORENAME to $1 and attempt to copy config.
+if [[ $# -eq 0 ]]; then
+  CORENAME=dev
+else
+  CORENAME-$1
+fi
+
+
+if [ -d /var/solr/data/${CORENAME}/conf ]; then
+  echo "Updating config for ${CORENAME} core."
+  cp /solr-conf/conf/* /var/solr/data/${CORENAME}/conf
+fi
